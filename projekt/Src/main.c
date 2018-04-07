@@ -51,20 +51,20 @@
 #include <math.h>
 #include <string.h>
 
-#define buf_size 255 //rozmiar bufora ko≥owego
-#define start 0x3A //adres poczπtku ramki
+#define buf_size 255 //rozmiar bufora kolwego
+#define start 0x3A //adres poczatku ramki
 #define dest_addr 0x55 //adres docelowy
-#define sour_addr 0x7F //adres ürÛd≥owy
-#define end1 0x0D //znak koÒca ramki
-#define end2 0x0A //znak koÒca ramki
+#define sour_addr 0x7F //adres zrodlowy
+#define end1 0x0D //znak konca ramki
+#define end2 0x0A //znak konca ramki
 
-#define wyswietl_temp 0x22 //komenda wyúwietlania temperatury
-#define wyswietl_pressure 0x23 //komenda wyúwietlania temperatury
+#define wyswietl_temp 0x22 //komenda wysietlania temperatury
+#define wyswietl_pressure 0x23 //komenda wysietlania temperatury
 
 const int led_on_off = 0x11; // komenda led on/led off
 const int miganie = 0x10; //miganie dioda
 
-int flaga; //flaga wykorzystywana do wyúwietlania temperatury co okreúlony czas (SysTick)
+int flaga; //flaga wykorzystywana do wysietlania temperatury co okreslony czas (SysTick)
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -89,22 +89,22 @@ const float ADCResolution = 4095.0;
 
 int wartoscADC1 = 0;
 int wartoscADC2 = 0;
-char TempCelsiusDisplay[] = "    .   C "; //inicjalizacja bufora wyúwietlania
+char TempCelsiusDisplay[] = "    .   C "; //inicjalizacja bufora wyÓØûietlania
 char PressureDisplay[] = "     hPa "; //przykladowa wartosc
 
 uint8_t Received;     //zmienna przechowujaca dane odebrane z usarta
 uint8_t przerwanie = 0;  // flaga informujaca o uruchomieniu przerwania usarta
-uint8_t buf_rx[buf_size]; //bufor ko≥owy
-uint8_t buf_end = 0; //indeks koÒca zapisu
+uint8_t buf_rx[buf_size]; //bufor koÈÄôwy
+uint8_t buf_end = 0; //indeks koÈéça zapisu
 uint8_t buf_start = 0; //indeks poczatku zapisu
 uint8_t CMD_buf_rx[buf_size]; //bufor pomocniczy
 uint8_t CMD_BUF_INDEX = 0; // indeks bufora
 uint16_t zapalona; //jak dlugo dioda zapalona
 uint16_t zgaszona; //jak dlugo dioda zgaszona
 
-uint8_t buf_tx[buf_size]; //bufor ko≥owy
+uint8_t buf_tx[buf_size]; //bufor kolowy
 uint8_t buf_xx[buf_size];
-uint8_t buf_tx_end = 0; //indeks koÒca zapisu
+uint8_t buf_tx_end = 0; //indeks konca zapisu
 uint8_t buf_tx_start = 0; //indeks poczatku zapisu
 uint8_t tx_transmit = 0;
 
@@ -149,8 +149,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 		//przerwanie wywolywane po wyslaniu znaku
 		if (buf_tx_end != buf_tx_start) {
 			int ile1 = 0;
-			while (buf_tx_end != buf_tx_start) { /*dopÛki w buforze jest coú do wyslania,
-				czego jeszcze nie wys≥aliúmy, bÍdziemy to dodawac do tablicy, a pozniej zostana wyslane*/
+			while (buf_tx_end != buf_tx_start) { /*dopoki w buforze jest cos do wyslania,
+				czego jeszcze nie wyswietlimy, bedziemy to dodawac do tablicy, a pozniej zostana wyslane*/
 				buf_xx[ile1++] = buf_tx[buf_tx_end++]; //zapisanie do bufora pomocniczego
 				if (buf_tx_end >= buf_size) {
 					buf_tx_end = 0;
@@ -162,8 +162,8 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 		}
 	}
 }
-void sprawdz(void) { //funkcja, ktÛra sprawdza czy zosta≥a przes≥ana odpowiednia ramka
-	if (flag == 5) { //czy odebrano znak koÒca ramki
+void sprawdz(void) { //funkcja, ktora sprawdza czy zostala przeslana odpowiednia ramka
+	if (flag == 5) { //czy odebrano znak konca ramki
 		uint16_t dlugosc = CMD_buf_rx[3]; //wyliczenie dlugosci ramki
 		uint16_t crc = crc1(&CMD_buf_rx[1], dlugosc + 2); //suma kontrolna
 		if (crc >= 0) {
@@ -198,7 +198,7 @@ void copy(void) {
 				flag = 0;
 			}
 		} else if (flag == 2) {
-			if (buf_rx[buf_start] == sour_addr) { //czy adres ürÛd≥owy
+			if (buf_rx[buf_start] == sour_addr) { //czy adres zrodlowy
 				CMD_buf_rx[CMD_BUF_INDEX++] = buf_rx[buf_start];
 				flag = 3;
 			} else {
@@ -206,7 +206,7 @@ void copy(void) {
 				flag = 0;
 			}
 		} else if (flag == 3) {
-			if (buf_rx[buf_start] == end1) { //czy znak koÒca ramki (pierwszy z dwÛch)
+			if (buf_rx[buf_start] == end1) { //czy znak koÈéça ramki (pierwszy z dwoch)
 				CMD_buf_rx[CMD_BUF_INDEX++] = buf_rx[buf_start];
 				flag = 4;
 			}
@@ -217,7 +217,7 @@ void copy(void) {
 				flag = 0;
 			}
 		} else if (flag == 4) {
-			if (buf_rx[buf_start] == end2) { //czy znak koÒca ramki
+			if (buf_rx[buf_start] == end2) { //czy znak konca ramki
 				CMD_buf_rx[CMD_BUF_INDEX++] = buf_rx[buf_start];
 				flag = 5;
 				sprawdz(); //sprawdzam czy cala ramka zostala przeslana i czy jest ona poprawna
@@ -226,7 +226,7 @@ void copy(void) {
 				CMD_BUF_INDEX = 0;
 			}
 		}
-		if (buf_rx[buf_start] == start) { //czy poczπtek ramki
+		if (buf_rx[buf_start] == start) { //czy poczaek ramki
 			if (flag == 0) {
 				CMD_buf_rx[CMD_BUF_INDEX++] = buf_rx[buf_start]; //zapisanie do bufora pomocniczego
 				flag = 1; //ustawiam flage na 1, co oznacza, ze teraz powinien przyjsc destination address
@@ -236,7 +236,7 @@ void copy(void) {
 	}
 }
 void dioda(void) {
-	if (CMD_buf_rx[4] == led_on_off) { //czy komenda w≥πczenia/wy≥πczenia diody
+	if (CMD_buf_rx[4] == led_on_off) { //czy komenda wlaczenia/wylaczenia diody
 		if (CMD_buf_rx[5] == 0x01) { //warunek na zapalenie diody
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 		} else {
@@ -244,8 +244,8 @@ void dioda(void) {
 		}
 	}
 	if (CMD_buf_rx[4] == miganie) { //warunek na miganie diody
-		zapalona = ((uint16_t) CMD_buf_rx[6] << 8) | CMD_buf_rx[7]; //ile czasu w≥πczona
-		zgaszona = ((uint16_t) CMD_buf_rx[8] << 8) | CMD_buf_rx[9]; //ile czasu wy≥πczona
+		zapalona = ((uint16_t) CMD_buf_rx[6] << 8) | CMD_buf_rx[7]; //ile czasu wlaczona
+		zgaszona = ((uint16_t) CMD_buf_rx[8] << 8) | CMD_buf_rx[9]; //ile czasu wylaczona
 		for (int i = 0; i < CMD_buf_rx[5]; i++) {
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 			HAL_Delay(zapalona);
@@ -352,13 +352,13 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	HAL_StatusTypeDef status1;
 
-	//czujnik ciúnienia i temperatury
+	//czujnik ciÓØïienia i temperatury
 	bmp180Device bmp180Device = { 0 };
 	bmp180Device.handle = &hi2c1;
 	bmp180Device.oversampling = 3;
 	status1 = bmp180ReadCoefficients(&bmp180Device);
 
-	status = SSD1306_Inicjacja(); //inicjacja wyúwietlacza SSD1306
+	status = SSD1306_Inicjacja(); //inicjacja wyÓØûietlacza SSD1306
 	if (status == TRUE) {
 		wyswietlTemp();
 		temp(TempCelsiusDisplay, PressureDisplay);
@@ -378,7 +378,7 @@ int main(void) {
 			bmp180Pressure = bmp180Device.pressure; //pobranie cisnienia
 			bmp180Temperature = bmp180Device.temperature; //pobranie temperatury
 
-			bmp180Pressure = round(bmp180Pressure * 1000.0); //zaokrπglenie do najbliøszej liczby ca≥kowitej
+			bmp180Pressure = round(bmp180Pressure * 1000.0); //zaokraglenie do najblizszej liczby calkowitej
 			bmp180Temperature = round(bmp180Temperature * 1000.0);
 
 			wyswietlTemp();
