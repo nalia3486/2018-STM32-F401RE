@@ -352,13 +352,13 @@ int main(void) {
 	/* USER CODE BEGIN WHILE */
 	HAL_StatusTypeDef status1;
 
-	//czujnik ciienia i temperatury
+	//czujnik cisnienia i temperatury
 	bmp180Device bmp180Device = { 0 };
 	bmp180Device.handle = &hi2c1;
 	bmp180Device.oversampling = 3;
 	status1 = bmp180ReadCoefficients(&bmp180Device);
 
-	status = SSD1306_Inicjacja(); //inicjacja wyietlacza SSD1306
+	status = SSD1306_Inicjacja(); //inicjacja wyswietlacza SSD1306
 	if (status == TRUE) {
 		wyswietlTemp();
 		temp(TempCelsiusDisplay, PressureDisplay);
