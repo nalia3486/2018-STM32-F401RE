@@ -2,7 +2,7 @@
  * function.c
  *
  *  Created on: 16 lut 2018
- *      Author: Natalia Pasturczak
+ *      Author: Naka
  */
 #include "function.h"
 
